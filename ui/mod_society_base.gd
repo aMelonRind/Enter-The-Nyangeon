@@ -21,12 +21,14 @@ func on_select_handle() -> void:
 	if on_select:
 		return
 	on_select = true
+	populate_serial += 1
 	GameEvents.emit_society_card_selected(self)
 	close_card()
 
 
 func out_select_card() -> void:
 	on_select = false
+	populate_serial += 1
 	open_card()
 
 
@@ -41,6 +43,8 @@ func check_group() -> void:
 
 
 func populate_player_cards(box: Node) -> void:
+	populate_serial += 1
+	var serial = populate_serial
 	for id in members:
 		if ModManager.is_character_locked(id):
 			continue
@@ -58,3 +62,6 @@ func populate_player_cards(box: Node) -> void:
 		if ins.has_method("set_branches"):
 			ins.call("set_branches", card)
 		await get_tree().create_timer(0.07).timeout
+		if serial != populate_serial:
+			ins.queue_free()
+			break

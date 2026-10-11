@@ -13,6 +13,8 @@ var on_select: bool = false
 
 @onready var card_group: Array =[player_card_1, player_card_2, player_card_3, player_card_4]
 
+static var populate_serial: int = 0
+
 func _ready():
 	mouse_entered.connect(mouse_select_anim)
 	mouse_exited.connect(mouse_out_anim)
@@ -31,6 +33,8 @@ func check_group():
 # 只实例化「已解锁」角色；先不实例化地读出卡内 player_card.id 判断（兼容 uid:// 路径），
 # 读不到时回退“实例化后判断并释放”，避免遗漏。
 func populate_player_cards(box: Node) -> void:
+	populate_serial += 1
+	var serial = populate_serial
 	for path in card_group:
 		if path == "":
 			continue
@@ -44,6 +48,9 @@ func populate_player_cards(box: Node) -> void:
 			continue
 		box.add_child(card_ins)
 		await get_tree().create_timer(0.07).timeout
+		if serial != populate_serial:
+			card_ins.queue_free()
+			break
 
 
 # 不实例化卡场景，直接读 PackedScene 根节点导出的 player_card 资源。
@@ -86,6 +93,7 @@ func on_select_card(event: InputEvent):
 
 func on_select_handle():
 	on_select = true
+	populate_serial += 1
 	card_anim.play("on_select_anim")
 	GameEvents.emit_society_card_selected(self)
 	close_card()
@@ -95,6 +103,7 @@ func on_select_handle():
 func out_select_card():
 	if on_select == true:
 		on_select = false
+		populate_serial += 1
 		card_anim.play("out_select_anim")
 		await get_tree().create_timer(0.3).timeout
 		open_card()

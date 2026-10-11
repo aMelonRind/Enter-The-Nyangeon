@@ -34,6 +34,8 @@ var society_card_group: Array[Node] = []
 var _default_society: Node = null
 var _society_gids: Array = []
 
+var populate_serial: int = 0
+
 func _ready():
 	SoundManager.cut_finish.connect(bgm_loop_play)
 	SoundManager.play_bgm_cut(bgm_first_cut)
@@ -217,8 +219,10 @@ func society_card_filter(society_card: Node):
 		society_card_group[0].out_select_card()
 		society_card_group.remove_at(0)
 	select_player.play("change_player_card")
+	populate_serial += 1
+	var serial = populate_serial
 	await player_card_clear_done
-	if society_card.has_method("populate_player_cards"):
+	if serial == populate_serial and society_card.has_method("populate_player_cards"):
 		await society_card.populate_player_cards(player_card_box)
 
 func change_player_card():

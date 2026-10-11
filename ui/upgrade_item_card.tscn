@@ -42,7 +42,7 @@ offset_bottom = 32.0
 texture = ExtResource("1_4f4e4")
 
 [node name="Label" type="Label" parent="Node2D"]
-offset_left = 14.0
+offset_left = 0.0
 offset_top = 19.0
 offset_right = 32.0
 offset_bottom = 33.0
